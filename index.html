@@ -5,15 +5,41 @@
 </head>
 <body>
 <script>
+let f = () => {
   const params = new URLSearchParams(window.location.search);
-  const urls = params.getAll('url'); 
-  for (let i = 0; i < urls.length; i++) {
-    if (i != urls.length - 1) {
-        window.open(urls[i], '_blank'); 
-    } else {
-        window.location.href = urls[i];
+  const urls = params.getAll('url');
+  if (urls.length == 0) {
+    alert("No URLs provided. Please provide URLs as query parameters like ?url=https%3A%2F%2Fexample.com&url=https%3A%2F%2Fexample2.com");
+    return;
+  }
+  if (urls.length == 1) {
+    window.location.href = urls[0];
+    return;
+  }
+
+  for (let i = 1; i < urls.length; i++) {
+    const url = urls[i];
+    console.log("Opening URL in new tab: " + url);
+    let newWin = window.open(url, '_blank');
+
+    if (i == urls.length - 1) {
+        setTimeout(() => {
+            if (!newWin || newWin.closed || typeof newWin.closed == 'undefined') {
+                console.log("Pop-up blocked for URL: " + url);
+                alert("The URL " + url + " could not be opened. Please unblock pop-ups.\n\n"+
+                "How to unblock pop-ups:\n"+
+                "  * Click the pop-up blocked icon in right end of the address bar\n    and allow pop-ups for this site.\n" +
+                "  * Or go to settings -> Privacy and security -> Site Settings -> Pop-ups\n    and redirects, then allow pop-ups for this site."
+                );
+                window.location.reload();
+            } else {
+                window.location.href = urls[0];
+            }
+        }, 100 + 100*i);
     }
   }
+};
+f();
 </script>
 </body>
 </html>
